@@ -27,7 +27,16 @@ class OrderService {
     }
 
     async getOrders() {
-        const selectSQL = `SELECT * FROM ordenes`;
+        const selectSQL = `SELECT * FROM ordenes WHERE estado =1`;
+        return await dbManager.execute('webapi', selectSQL);
+    }
+
+    async getOrderById(orderId) {
+        const selectSQL = `SELECT * FROM ordenes WHERE id = ${orderId} `;
+        return await dbManager.execute('webapi', selectSQL);
+    }
+    async deleteOrderById(orderId) {
+        const selectSQL = `UPDATE ordenes SET estado=0 WHERE id = ${orderId} `;
         return await dbManager.execute('webapi', selectSQL);
     }
 }

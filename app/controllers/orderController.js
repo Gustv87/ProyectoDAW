@@ -1,5 +1,6 @@
 const HTTPCodes = require('../sys/httpCodes')
 const orderService = require('../services/orderService')
+const validator = require('../sys/validator')
 
 class OrderController {
     async postOrder(req, res) {
@@ -88,6 +89,59 @@ class OrderController {
             response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
             res.status(response.code).send(response);
         }
+    }
+
+    async  getOrderById(req, res) {
+        let response = {
+            success: true,
+            message: 'success',
+            code: HTTPCodes.OK
+        }
+        try {
+            if (validator.isNumber(req.params.id)) {
+                response.data = await orderService.getOrderById(req.params.id);
+                res.status(response.code).send(response);
+            } else {
+                response.success = false;
+                response.message = "Tiene que poner un numero";
+                response.code = HTTPCodes.BAD_REQUEST;
+                res.status(response.code).send(response);
+            }
+
+        } catch (error) {
+            response.success = false;
+            response.message = "database exception " + error;
+            response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
+            res.status(response.code).send(response);
+        }
+
+    }
+
+
+    async  deleteOrderById(req, res) {
+        let response = {
+            success: true,
+            message: 'success',
+            code: HTTPCodes.OK
+        }
+        try {
+            if (validator.isNumber(req.params.id)) {
+                response.data = await orderService.deleteOrderById(req.params.id);
+                res.status(response.code).send(response);
+            } else {
+                response.success = false;
+                response.message = "Tiene que poner un numero";
+                response.code = HTTPCodes.BAD_REQUEST;
+                res.status(response.code).send(response);
+            }
+
+        } catch (error) {
+            response.success = false;
+            response.message = "database exception " + error;
+            response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
+            res.status(response.code).send(response);
+        }
+
     }
 }
 
