@@ -5,6 +5,70 @@ const validator = require('../sys/validator')
 
 
 class UserController {
+
+async postUser(req,res){
+    
+    let response = {
+        success: true,
+        message: 'success',
+        code: HTTPCodes.OK
+    }
+
+    try{
+        let errorMessage =[];
+        // if(!req.body.id){
+        //     errorMessage.push('Id de usuario es requerido');
+        // }
+        // else if(isNumber(req.body.id)){
+        //     errorMessage.push('Id debe de ser entero');
+
+        // }
+        if (errorMessage.length) {
+            response.success = false;
+            response.code = HTTPCodes.BAD_REQUEST;
+            response.message = errorMessage;
+            res.status(response.code).send(response);
+        }
+
+        await UserService.createUser(req.body);
+    } catch (error) {
+        
+    }
+    res.send(response);
+}
+
+async putUser(req,res){
+   
+    let response = {
+        success: true,
+        message: 'success',
+        code: HTTPCodes.OK
+    }   
+
+    try{
+        let errorMessage =[];
+        if(!req.params.id){
+            errorMessage.push('Id de usuario es requerido');
+        }
+        else if(!isNumber(req.params.id)){
+            errorMessage.push('Id debe de ser entero');
+
+        }
+        if (errorMessage.length) {
+            response.success = false;
+            response.code = HTTPCodes.BAD_REQUEST;
+            response.message = errorMessage;
+            res.status(response.code).send(response);
+        }
+
+        await UserService.updateUser(req.params.id, req.body);
+    } catch (error) {
+        
+    }
+    res.send(response);
+}
+
+
     async getUsers(req, res){
 
         let response = {
@@ -14,7 +78,17 @@ class UserController {
         }
 
         try {
-            response.data = await UserService.getUsers();
+            var offset = 0;
+            var limit = 10;
+
+            if(req.query.offset && validator.isNumber(req.query.offset)){
+                offset = req.query.offset;
+            }
+            if(req.query.limit && validator.isNumber(req.query.limit)){
+                limit = req.query.limit;
+            }
+
+            response.data = await UserService.getUsers(offset, limit);
             res.status(response.code).send(response);
         } catch (error) {
             response.success = false;

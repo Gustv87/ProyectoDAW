@@ -1,6 +1,7 @@
-const HTTPCodes = require('../sys/httpCodes')
-const orderService = require('../services/orderService')
-const validator = require('../sys/validator')
+const HTTPCodes = require('../sys/httpCodes');
+const orderService = require('../services/orderService');
+const validator = require('../sys/validator');
+const responseFactory = require('../sys/responseFactory');
 
 class OrderController {
     async postOrder(req, res) {
@@ -74,21 +75,37 @@ class OrderController {
     }
 
     async getOrders(req, res) {
-        let response = {
-            success: true,
-            message: 'success',
-            code: HTTPCodes.OK
-        }
-
+        let response = { }
+        console.log(req.query);
         try {
-            response.data = await orderService.getOrders();
+             var offset =0;
+             var limit = 10;
+             var desde = "01-01-1980";
+             var hasta = "01-01-3000";
+            if(req.query.offset && validator.isNumber(req.query.offset)){
+                offset = req.query.offset;
+            }
+            if(req.query.limit && validator.isNumber(req.query.limit)){
+                limit = req.query.limit;
+            }
+
+            if(req.query.desde && validator.isDate(req.query.desde)){
+                desde = req.query.desde;
+            }
+            if(req.query.hasta && validator.isDate(req.query.hasta)){
+                hasta = req.query.hasta;
+            }
+           
+            response = responseFactory.getResponseStruct(HTTPCodes.OK);
+            response.data = await orderService.getOrders(desde,hasta, offset,limit);
+            
             res.status(response.code).send(response);
         } catch (error) {
-            response.success = false;
-            response.message = "database exception " + error;
-            response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
+            response = responseFactory.getResponseStruct(HTTPCodes.INTERNAL_SERVER_ERROR);            
             res.status(response.code).send(response);
         }
+
+
     }
 
     async  getOrderById(req, res) {

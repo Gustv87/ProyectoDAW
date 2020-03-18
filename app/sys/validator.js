@@ -11,7 +11,7 @@ class Validator {
     }
 
     isDate(stringToValidate){
-        var regularExpression = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+        var regularExpression = /^\d{1,2}-\d{1,2}-\d{4}$/;
         return regularExpression.test(stringToValidate);
     }
 

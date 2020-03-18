@@ -26,8 +26,14 @@ class OrderService {
 
     }
 
-    async getOrders() {
-        const selectSQL = `SELECT * FROM ordenes WHERE estado =1`;
+    async getOrders(desde,hasta,offset,limit) {
+        const selectSQL =
+        
+         `SELECT date(fecha) AS fecha, id, cliente_id, estado FROM ordenes WHERE estado =1 
+          AND fecha BETWEEN STR_TO_DATE('${desde}', '%d-%m-%Y')
+                   AND STR_TO_DATE('${hasta}', '%d-%m-%Y')
+          LIMIT ${limit} OFFSET ${offset}`;
+          console.log(selectSQL);
         return await dbManager.execute('webapi', selectSQL);
     }
 
