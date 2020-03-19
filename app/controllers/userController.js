@@ -6,70 +6,77 @@ const validator = require('../sys/validator')
 
 class UserController {
 
-async postUser(req,res){
-    
-    let response = {
-        success: true,
-        message: 'success',
-        code: HTTPCodes.OK
-    }
+    async postUser(req, res) {
 
-    try{
-        let errorMessage =[];
-        // if(!req.body.id){
-        //     errorMessage.push('Id de usuario es requerido');
-        // }
-        // else if(isNumber(req.body.id)){
-        //     errorMessage.push('Id debe de ser entero');
-
-        // }
-        if (errorMessage.length) {
-            response.success = false;
-            response.code = HTTPCodes.BAD_REQUEST;
-            response.message = errorMessage;
-            res.status(response.code).send(response);
+        let response = {
+            success: true,
+            message: 'success',
+            code: HTTPCodes.OK
         }
 
-        await UserService.createUser(req.body);
-    } catch (error) {
+        try {
+            let errorMessage = [];
+            
+            if (errorMessage.length) {
+                response.success = false;
+                response.code = HTTPCodes.BAD_REQUEST;
+                response.message = errorMessage;
+                res.status(response.code).send(response);
+            }
+
+            await UserService.createUser(req.body);
+        } catch (error) {
+
+        }
+        res.send(response);
+    }
+
+    async putUser(req, res) {
+       
+        let response = {
+            success: true,
+            message: 'success',
+            code: HTTPCodes.OK
+        }
+
+        try {
+            let errorMessage = [];
+            if (!req.params.id) {
+                errorMessage.push('Id de usuario es requerido');
+            }
+            else if (!validator.isNumber(req.params.id)) {
+                errorMessage.push('Id debe de ser entero');
+
+            }
+            req.body.usuario = req.body.usuario.trim();
+            req.body.email = req.body.email.trim();
+            req.body.nombre = req.body.nombre.trim();
+            req.body.contrasena= req.body.contrasena.trim();
+            req.body.rol = req.body.rol.trim();
+            if (errorMessage.length) {
+                response.success = false;
+                response.code = HTTPCodes.BAD_REQUEST;
+                response.message = errorMessage;
+                res.status(response.code).send(response);
+            }
+
+            await UserService.updateUser(req.params.id, req.body);
+        } catch (error) {
+            console.log(error.sqlMessage);
+            if (error.sqlMessage) {
+                response.message = error.sqlMessage;
+            } else {
+                response.message = "Internal Server Error";
+            }
+            response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
+            response.success = false;
+        }
+        res.status(response.code).send(response);
         
     }
-    res.send(response);
-}
-
-async putUser(req,res){
-   
-    let response = {
-        success: true,
-        message: 'success',
-        code: HTTPCodes.OK
-    }   
-
-    try{
-        let errorMessage =[];
-        if(!req.params.id){
-            errorMessage.push('Id de usuario es requerido');
-        }
-        else if(!isNumber(req.params.id)){
-            errorMessage.push('Id debe de ser entero');
-
-        }
-        if (errorMessage.length) {
-            response.success = false;
-            response.code = HTTPCodes.BAD_REQUEST;
-            response.message = errorMessage;
-            res.status(response.code).send(response);
-        }
-
-        await UserService.updateUser(req.params.id, req.body);
-    } catch (error) {
-        
-    }
-    res.send(response);
-}
 
 
-    async getUsers(req, res){
+    async getUsers(req, res) {
 
         let response = {
             success: true,
@@ -81,10 +88,10 @@ async putUser(req,res){
             var offset = 0;
             var limit = 10;
 
-            if(req.query.offset && validator.isNumber(req.query.offset)){
+            if (req.query.offset && validator.isNumber(req.query.offset)) {
                 offset = req.query.offset;
             }
-            if(req.query.limit && validator.isNumber(req.query.limit)){
+            if (req.query.limit && validator.isNumber(req.query.limit)) {
                 limit = req.query.limit;
             }
 
