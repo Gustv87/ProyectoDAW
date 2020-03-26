@@ -1,9 +1,12 @@
 const HTTPCodes = require('../sys/httpCodes');
-const vendorService = require('../services/vendorService');
 const validator = require('../sys/validator');
+const ClientService = require('../services/clientService');
 
-class VendorController{
-    async getVendors(req, res) {
+
+class ClientController{
+
+    async getClient(req, res) {
+
         let response = {
             success: true,
             message: 'success',
@@ -11,16 +14,17 @@ class VendorController{
         }
 
         try {
-            var offset=0;
+            var offset = 0;
             var limit = 10;
 
-            if(req.query.offset && validator.isNumber(req.query.offset)){
+            if (req.query.offset && validator.isNumber(req.query.offset)) {
                 offset = req.query.offset;
             }
-            if(req.query.limit && validator.isNumber(req.query.limit)){
+            if (req.query.limit && validator.isNumber(req.query.limit)) {
                 limit = req.query.limit;
             }
-            response.data = await vendorService.getVendors(offset, limit);
+
+            response.data = await ClientService.getClient(offset, limit);
             res.status(response.code).send(response);
         } catch (error) {
             response.success = false;
@@ -30,7 +34,7 @@ class VendorController{
         }
     }
 
-    async  getVendorsById(req, res) {
+    async  getClientById(req, res) {
         let response = {
             success: true,
             message: 'success',
@@ -38,7 +42,7 @@ class VendorController{
         }
         try {
             if (validator.isNumber(req.params.id)) {
-                response.data = await vendorService.getVendorsById(req.params.id);
+                response.data = await ClientService.getClientById(req.params.id);
                 res.status(response.code).send(response);
             } else {
                 response.success = false;
@@ -55,9 +59,7 @@ class VendorController{
         }
 
     }
-
-
-    async postVendor(req, res) {
+    async postClient(req, res) {
 
         let response = {
             success: true,
@@ -75,14 +77,14 @@ class VendorController{
                 res.status(response.code).send(response);
             }
 
-            await vendorService.createVendor(req.body);
+            await ClientService.createClient(req.body);
         } catch (error) {
 
         }
         res.send(response);
     }
 
-    async putVendor(req, res) {
+    async putClient(req, res) {
        
         let response = {
             success: true,
@@ -93,16 +95,16 @@ class VendorController{
         try {
             let errorMessage = [];
             if (!req.params.id) {
-                errorMessage.push('Id del proveedor es requerido');
+                errorMessage.push('Id del Ciente es requerido');
             }
             else if (!validator.isNumber(req.params.id)) {
                 errorMessage.push('Id debe de ser entero');
 
             }
             req.body.nombre = req.body.nombre.trim();
-            req.body.direccion = req.body.direccion.trim();
             req.body.telefono = req.body.telefono.trim();
-            req.body.celular= req.body.celular.trim();
+            req.body.celular = req.body.celular.trim();
+            req.body.direccion= req.body.direccion.trim();
             req.body.email = req.body.email.trim();
             if (errorMessage.length) {
                 response.success = false;
@@ -111,7 +113,7 @@ class VendorController{
                 res.status(response.code).send(response);
             }
 
-            await vendorService.updateVendor(req.params.id, req.body);
+            await ClientService.updateClient(req.params.id, req.body);
         } catch (error) {
             console.log(error.sqlMessage);
             if (error.sqlMessage) {
@@ -125,6 +127,9 @@ class VendorController{
         res.status(response.code).send(response);
         
     }
+
+
 }
 
-module.exports = new VendorController();
+module.exports = new ClientController();
+

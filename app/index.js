@@ -10,6 +10,7 @@ const productRoutes = require('../app/routes/productRoutes');
 const orderRoutes = require('../app/routes/orderRoutes');
 const userRoutes = require('../app/routes/userRoute');
 const vendorRoutes = require('../app/routes/vendorRoute');
+const clientRoutes = require('../app/routes/clientRoute');
 
 
 
@@ -18,6 +19,7 @@ app.use('/api/product', productRoutes);
 app.use('/api/order', orderRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/vendor',vendorRoutes);
+app.use('/api/client', clientRoutes);
 
 const port = 3000;
 app.listen(port,
