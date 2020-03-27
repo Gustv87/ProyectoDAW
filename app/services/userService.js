@@ -26,7 +26,7 @@ class UserService {
         console.log(selectSQL);
         return await dbManager.execute('webapi', selectSQL);
     }
-    
+
     async deleteUserById(userId) {
         const selectSQL = `DELETE  FROM usuarios WHERE id = ${userId} `;
         return await dbManager.execute('webapi', selectSQL);

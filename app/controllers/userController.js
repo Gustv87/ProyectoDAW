@@ -2,13 +2,9 @@ const HTTPCodes = require('../sys/httpCodes')
 const UserService = require('../services/userService')
 const validator = require('../sys/validator')
 
-
-
 class UserController {
 
-    
     async getUsers(req, res) {
-
         let response = {
             success: true,
             message: 'success',
@@ -25,7 +21,6 @@ class UserController {
             if (req.query.limit && validator.isNumber(req.query.limit)) {
                 limit = req.query.limit;
             }
-
             response.data = await UserService.getUsers(offset, limit);
             res.status(response.code).send(response);
         } catch (error) {
@@ -71,7 +66,7 @@ class UserController {
 
         try {
             let errorMessage = [];
-            
+
             if (errorMessage.length) {
                 response.success = false;
                 response.code = HTTPCodes.BAD_REQUEST;
@@ -87,7 +82,7 @@ class UserController {
     }
 
     async putUser(req, res) {
-       
+
         let response = {
             success: true,
             message: 'success',
@@ -106,8 +101,9 @@ class UserController {
             req.body.usuario = req.body.usuario.trim();
             req.body.email = req.body.email.trim();
             req.body.nombre = req.body.nombre.trim();
-            req.body.contrasena= req.body.contrasena.trim();
+            req.body.contrasena = req.body.contrasena.trim();
             req.body.rol = req.body.rol.trim();
+
             if (errorMessage.length) {
                 response.success = false;
                 response.code = HTTPCodes.BAD_REQUEST;
@@ -127,7 +123,7 @@ class UserController {
             response.success = false;
         }
         res.status(response.code).send(response);
-        
+
     }
 
     async  deleteUserById(req, res) {

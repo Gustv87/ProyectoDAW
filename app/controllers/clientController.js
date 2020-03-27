@@ -3,7 +3,7 @@ const validator = require('../sys/validator');
 const ClientService = require('../services/clientService');
 
 
-class ClientController{
+class ClientController {
 
     async getClient(req, res) {
 
@@ -69,7 +69,84 @@ class ClientController{
 
         try {
             let errorMessage = [];
+
+            if (!req.body.telefono) {
+                errorMessage.push('Parametro telefono del cliente requerido');
+            } else if (isNaN(req.body.telefono)) {
+                errorMessage.push('Parametro Telefono tiene que ser entero');
+            } 
             
+
+            if (!req.body.celular) {
+                errorMessage.push('Parametro celular del cliente es requerido');
+            } else if (isNaN(req.body.celular)) {
+                errorMessage.push('Parametro celular tiene que ser entero');
+            }
+
+            if (!req.body.nombre) {
+                errorMessage.push('Parametro nombre del cliente es requerido');
+            } else if (isText(req.body.nombre)) {
+                errorMessage.push('Parametro tiene que ser solo letras')
+            }
+
+            if (!req.body.direccion) {
+                errorMessage.push('Parametro direccion del cliente es requerido');
+            }
+
+            if (!req.body.email) {
+                errorMessage.push('Parametro email del cliente es requerido');
+            } else if (isEmailAddress(req.body.email)) {
+                errorMessage.push('El formato del email es incorrecto  ejemplo@ejemplo.com');
+            }
+
+            let telefonoCorrecto = true;
+            let celularCorrecto = true;
+            let nombreCorrecto = true;
+            let direccionCorrecta = true;
+            let emailcorrecto = true;
+
+            req.body.clientes.forEach(client => {
+                if (!client.telefono) {
+                    telefonoCorrecto = false;
+                } else if (isNaN(client.telefono)) {
+                    telefonoCorrecto = false;
+                }
+
+                if (!client.celular) {
+                    celularCorrecto = false;
+                } else if (isNaN(client.celular)) {
+                    celularCorrecto = false;
+                }
+
+                if (!client.nombre) {
+                    nombreCorrecto = false;
+                } else if (isText(client.nombre)) {
+                    nombreCorrecto = false;
+                }
+
+                if (!client.direccion){
+                    direccionCorrecta = false;
+                }
+
+                if (!client.email){
+                    emailcorrecto = false;
+                } else if (isEmailAddress(client.email)){
+                    emailcorrecto = false;
+                }
+            });
+
+            if(!telefonoCorrecto){
+                errorMessage.push("El parametro Telefono nesecita ser entero");
+            }
+            if(!celularCorrecto){
+                errorMessage.push("El parametro Celular necesita ser entero");
+            }
+            if(!nombreCorrecto){
+                errorMessage.push("El parametro Nombre tiene que ser solo letras");
+            }
+            if(!emailcorrecto){
+                errorMessage.push("El parametro Email no es correcto ejemplo: ejemplo@ejemplo.com")
+            }
             if (errorMessage.length) {
                 response.success = false;
                 response.code = HTTPCodes.BAD_REQUEST;
@@ -85,7 +162,7 @@ class ClientController{
     }
 
     async putClient(req, res) {
-       
+
         let response = {
             success: true,
             message: 'success',
@@ -104,8 +181,9 @@ class ClientController{
             req.body.nombre = req.body.nombre.trim();
             req.body.telefono = req.body.telefono.trim();
             req.body.celular = req.body.celular.trim();
-            req.body.direccion= req.body.direccion.trim();
+            req.body.direccion = req.body.direccion.trim();
             req.body.email = req.body.email.trim();
+
             if (errorMessage.length) {
                 response.success = false;
                 response.code = HTTPCodes.BAD_REQUEST;
@@ -125,7 +203,7 @@ class ClientController{
             response.success = false;
         }
         res.status(response.code).send(response);
-        
+
     }
 
 
