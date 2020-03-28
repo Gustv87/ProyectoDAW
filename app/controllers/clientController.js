@@ -1,16 +1,14 @@
 const HTTPCodes = require('../sys/httpCodes');
 const validator = require('../sys/validator');
 const ClientService = require('../services/clientService');
-
+const responseFactory = require('../sys/responseFactory');
 
 class ClientController {
 
     async getClient(req, res) {
 
         let response = {
-            success: true,
-            message: 'success',
-            code: HTTPCodes.OK
+            
         }
 
         try {
@@ -24,12 +22,11 @@ class ClientController {
                 limit = req.query.limit;
             }
 
+            response = responseFactory.getResponseStruct(HTTPCodes.OK);
             response.data = await ClientService.getClient(offset, limit);
-            res.status(response.code).send(response);
+            
         } catch (error) {
-            response.success = false;
-            response.message = "database exception " + error;
-            response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
+            response = responseFactory.getResponseStruct(HTTPCodes.INTERNAL_SERVER_ERROR);            
             res.status(response.code).send(response);
         }
     }
@@ -60,34 +57,35 @@ class ClientController {
 
     }
     async postClient(req, res) {
-
+       
         let response = {
             success: true,
             message: 'success',
             code: HTTPCodes.OK
         }
+         
 
         try {
             let errorMessage = [];
 
+            if (!req.body.nombre) {
+                errorMessage.push('Parametro nombre del cliente es requerido');
+            } else if (!validator.isText(req.body.nombre)) {
+                errorMessage.push('Parametro tiene que ser solo letras')
+            }
+
             if (!req.body.telefono) {
                 errorMessage.push('Parametro telefono del cliente requerido');
-            } else if (isNaN(req.body.telefono)) {
+            } else if (!validator.isPhone(req.body.telefono)) {
                 errorMessage.push('Parametro Telefono tiene que ser entero');
             } 
             
 
             if (!req.body.celular) {
                 errorMessage.push('Parametro celular del cliente es requerido');
-            } else if (isNaN(req.body.celular)) {
+            } else if (!validator.isPhone(req.body.celular)) {
                 errorMessage.push('Parametro celular tiene que ser entero');
-            }
-
-            if (!req.body.nombre) {
-                errorMessage.push('Parametro nombre del cliente es requerido');
-            } else if (isText(req.body.nombre)) {
-                errorMessage.push('Parametro tiene que ser solo letras')
-            }
+            }           
 
             if (!req.body.direccion) {
                 errorMessage.push('Parametro direccion del cliente es requerido');
@@ -95,69 +93,28 @@ class ClientController {
 
             if (!req.body.email) {
                 errorMessage.push('Parametro email del cliente es requerido');
-            } else if (isEmailAddress(req.body.email)) {
+            } else if (!validator.isEmailAddress(req.body.email)) {
                 errorMessage.push('El formato del email es incorrecto  ejemplo@ejemplo.com');
             }
-
-            let telefonoCorrecto = true;
-            let celularCorrecto = true;
-            let nombreCorrecto = true;
-            let direccionCorrecta = true;
-            let emailcorrecto = true;
-
-            req.body.clientes.forEach(client => {
-                if (!client.telefono) {
-                    telefonoCorrecto = false;
-                } else if (isNaN(client.telefono)) {
-                    telefonoCorrecto = false;
-                }
-
-                if (!client.celular) {
-                    celularCorrecto = false;
-                } else if (isNaN(client.celular)) {
-                    celularCorrecto = false;
-                }
-
-                if (!client.nombre) {
-                    nombreCorrecto = false;
-                } else if (isText(client.nombre)) {
-                    nombreCorrecto = false;
-                }
-
-                if (!client.direccion){
-                    direccionCorrecta = false;
-                }
-
-                if (!client.email){
-                    emailcorrecto = false;
-                } else if (isEmailAddress(client.email)){
-                    emailcorrecto = false;
-                }
-            });
-
-            if(!telefonoCorrecto){
-                errorMessage.push("El parametro Telefono nesecita ser entero");
-            }
-            if(!celularCorrecto){
-                errorMessage.push("El parametro Celular necesita ser entero");
-            }
-            if(!nombreCorrecto){
-                errorMessage.push("El parametro Nombre tiene que ser solo letras");
-            }
-            if(!emailcorrecto){
-                errorMessage.push("El parametro Email no es correcto ejemplo: ejemplo@ejemplo.com")
-            }
-            if (errorMessage.length) {
+            if (errorMessage.length > 0) {
                 response.success = false;
                 response.code = HTTPCodes.BAD_REQUEST;
                 response.message = errorMessage;
                 res.status(response.code).send(response);
+                
+            }
+            else{
+                await ClientService.createClient(req.body);
             }
 
-            await ClientService.createClient(req.body);
+           
         } catch (error) {
-
+            response.success = false;
+            response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
+            response.message = error;
         }
+        
+        
         res.send(response);
     }
 
