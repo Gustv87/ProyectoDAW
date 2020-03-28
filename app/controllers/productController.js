@@ -67,16 +67,36 @@ class ProductController {
         try {
             let errorMessage = [];
 
-            if (errorMessage.length) {
+            if (!req.body.nombre) {
+                errorMessage.push('El parametro nombre es requerido');
+            } 
+            
+            if(!req.body.marca){
+                errorMessage.push('El parametro marca es requerido');
+            }
+
+            if(!req.body.descripcion){
+                errorMessage.push('El parametro descripcion es requerido')
+            }
+
+            if(!req.body.categoria){
+                errorMessage.push('El parametro categoria es requerido')
+            }
+
+            if (errorMessage.length > 0) {
                 response.success = false;
                 response.code = HTTPCodes.BAD_REQUEST;
                 response.message = errorMessage;
                 res.status(response.code).send(response);
             }
 
-            await productService.createProduct(req.body);
+            else {
+                await productService.createProduct(req.body);
+            }
         } catch (error) {
-
+            response.success = false;
+            response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
+            response.message = error;
         }
         res.send(response);
     }

@@ -8,7 +8,7 @@ class ClientController {
     async getClient(req, res) {
 
         let response = {
-            
+
         }
 
         try {
@@ -24,9 +24,9 @@ class ClientController {
 
             response = responseFactory.getResponseStruct(HTTPCodes.OK);
             response.data = await ClientService.getClient(offset, limit);
-            
+
         } catch (error) {
-            response = responseFactory.getResponseStruct(HTTPCodes.INTERNAL_SERVER_ERROR);            
+            response = responseFactory.getResponseStruct(HTTPCodes.INTERNAL_SERVER_ERROR);
             res.status(response.code).send(response);
         }
     }
@@ -57,13 +57,13 @@ class ClientController {
 
     }
     async postClient(req, res) {
-       
+
         let response = {
             success: true,
             message: 'success',
             code: HTTPCodes.OK
         }
-         
+
 
         try {
             let errorMessage = [];
@@ -78,14 +78,14 @@ class ClientController {
                 errorMessage.push('Parametro telefono del cliente requerido');
             } else if (!validator.isPhone(req.body.telefono)) {
                 errorMessage.push('Parametro Telefono tiene que ser entero');
-            } 
-            
+            }
+
 
             if (!req.body.celular) {
                 errorMessage.push('Parametro celular del cliente es requerido');
             } else if (!validator.isPhone(req.body.celular)) {
                 errorMessage.push('Parametro celular tiene que ser entero');
-            }           
+            }
 
             if (!req.body.direccion) {
                 errorMessage.push('Parametro direccion del cliente es requerido');
@@ -101,20 +101,18 @@ class ClientController {
                 response.code = HTTPCodes.BAD_REQUEST;
                 response.message = errorMessage;
                 res.status(response.code).send(response);
-                
+
             }
-            else{
+            else {
                 await ClientService.createClient(req.body);
             }
-
-           
         } catch (error) {
             response.success = false;
             response.code = HTTPCodes.INTERNAL_SERVER_ERROR;
             response.message = error;
         }
-        
-        
+
+
         res.send(response);
     }
 
