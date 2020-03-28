@@ -117,6 +117,23 @@ class ProductController {
                 errorMessage.push('Id debe de ser numero entero');
 
             }
+
+            if (!req.body.nombre) {
+                errorMessage.push('El parametro nombre es requerido');
+            } 
+            
+            if(!req.body.marca){
+                errorMessage.push('El parametro marca es requerido');
+            }
+
+            if(!req.body.descripcion){
+                errorMessage.push('El parametro descripcion es requerido')
+            }
+
+            if(!req.body.categoria){
+                errorMessage.push('El parametro categoria es requerido')
+            }
+
             req.body.nombre = req.body.nombre.trim();
             req.body.marca = req.body.marca.trim();
             req.body.descripcion = req.body.descripcion.trim();
@@ -129,7 +146,10 @@ class ProductController {
                 res.status(response.code).send(response);
             }
 
-            await productService.updateProduct(req.params.id, req.body);
+            else{
+                await productService.updateProduct(req.params.id, req.body);
+            }
+           
         } catch (error) {
             console.log(error.sqlMessage);
             if (error.sqlMessage) {
