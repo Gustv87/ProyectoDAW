@@ -133,6 +133,34 @@ class ClientController {
                 errorMessage.push('Id debe de ser entero');
 
             }
+            if (!req.body.nombre) {
+                errorMessage.push('Parametro nombre del cliente es requerido');
+            } else if (!validator.isText(req.body.nombre)) {
+                errorMessage.push('Parametro nombre tiene que ser solo letras')
+            }
+
+            if (!req.body.telefono) {
+                errorMessage.push('Parametro telefono del cliente requerido');
+            } else if (!validator.isPhone(req.body.telefono)) {
+                errorMessage.push('Parametro Telefono tiene que ser entero');
+            }
+
+
+            if (!req.body.celular) {
+                errorMessage.push('Parametro celular del cliente es requerido');
+            } else if (!validator.isPhone(req.body.celular)) {
+                errorMessage.push('Parametro celular tiene que ser entero');
+            }
+
+            if (!req.body.direccion) {
+                errorMessage.push('Parametro direccion del cliente es requerido');
+            }
+
+            if (!req.body.email) {
+                errorMessage.push('Parametro email del cliente es requerido');
+            } else if (!validator.isEmailAddress(req.body.email)) {
+                errorMessage.push('El formato del email es incorrecto  ejemplo@ejemplo.com');
+            }
             req.body.nombre = req.body.nombre.trim();
             req.body.telefono = req.body.telefono.trim();
             req.body.celular = req.body.celular.trim();
@@ -145,8 +173,10 @@ class ClientController {
                 response.message = errorMessage;
                 res.status(response.code).send(response);
             }
+            else {
+                await ClientService.updateClient(req.params.id, req.body);
+            }
 
-            await ClientService.updateClient(req.params.id, req.body);
         } catch (error) {
             console.log(error.sqlMessage);
             if (error.sqlMessage) {
